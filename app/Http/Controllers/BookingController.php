@@ -17,9 +17,11 @@ class BookingController extends Controller
     {
         $validated = $request->validate([
             'origin' => 'required|string|max:255',
-            'destination' => 'required|string|max:255',
-            'travel_date' => 'required|date',
+            'destination' => 'required|string|max:255|different:origin',
+            'travel_date' => 'required|date|after_or_equal:today',
             'travel_time' => 'required',
+        ], [
+            'destination.different' => 'Origin and Destination must be different.',
         ]);
 
         auth()->user()->bookings()->create($validated);

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
+            {{ __('Welcome to Quantum Sky Bus') }}
         </h2>
     </x-slot>
 
@@ -17,18 +17,22 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label for="origin" class="block font-medium">Origin</label>
-                            <input type="text" name="origin" id="origin" class="w-full border rounded px-3 py-2 mt-1" required>
+                            <label for="origin" class="block font-medium">Origin (City, Province)</label>
+                            <input type="text" name="origin" id="origin" placeholder="e.g. San Fernando, Pampanga" class="w-full border rounded px-3 py-2 mt-1" required>
                         </div>
 
                         <div>
-                            <label for="destination" class="block font-medium">Destination</label>
-                            <input type="text" name="destination" id="destination" class="w-full border rounded px-3 py-2 mt-1" required>
+                            <label for="destination" class="block font-medium">Destination (City, Province)</label>
+                            <input type="text" name="destination" id="destination" placeholder="e.g. Angeles City, Pampanga" class="w-full border rounded px-3 py-2 mt-1" required>
+
+                            @error('destination')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
                             <label for="travel_date" class="block font-medium">Travel Date</label>
-                            <input type="date" name="travel_date" id="travel_date" class="w-full border rounded px-3 py-2 mt-1" required>
+                            <input type="date" name="travel_date" id="travel_date" class="w-full border rounded px-3 py-2 mt-1" min="{{ date('Y-m-d') }}" required>
                         </div>
 
                         <div>
@@ -75,6 +79,23 @@
             </div>
 
         </div>
+
+        <script>
+            const form = document.querySelector('form');
+            const originInput = document.getElementById('origin');
+            const destinationInput = document.getElementById('destination');
+
+            form.addEventListener('submit', function(e) {
+                const origin = originInput.value.trim().toLowerCase();
+                const destination = destinationInput.value.trim().toLowerCase();
+
+                if (origin === destination) {
+                    e.preventDefault();
+                    alert('Origin and Destination cannot be the same.');
+                }
+            });
+        </script>
+
     </div>
 
 </x-app-layout>
