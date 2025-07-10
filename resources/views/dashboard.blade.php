@@ -10,35 +10,31 @@
 
             {{-- Booking Form --}}
             <div class="bg-white p-6 rounded shadow mb-10">
-                <h2 class="text-2xl font-semibold mb-6">Book a Bus</h2>
+                <h2 class="text-2xl font-semibold mb-6">Start Booking Here</h2>
 
                 <form method="POST" action="{{ route('bookings.store') }}">
                     @csrf
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label for="origin" class="block font-medium">Origin (City, Province)</label>
-                            <input type="text" name="origin" id="origin" placeholder="e.g. San Fernando, Pampanga" class="w-full border rounded px-3 py-2 mt-1" required>
-                        </div>
+                        <div class="mb-4">
+                            <label for="trip_id" class="block font-medium">Choose a Trip</label>
+                            <select name="trip_id" id="trip_id" class="w-full border rounded px-3 py-2 mt-1" required>
+                                <option value="">-- Select Trip --</option>
+                                {{-- Actual trips --}}
+                                @foreach($trips as $trip)
+                                <option value="{{ $trip->id }}">
+                                    {{ $trip->origin }} to {{ $trip->destination }} on {{ \Carbon\Carbon::parse($trip->travel_date)->format('M d, Y') }} at {{ \Carbon\Carbon::parse($trip->travel_time)->format('h:i A') }}
+                                </option>
+                                @endforeach
+                            </select>
 
-                        <div>
-                            <label for="destination" class="block font-medium">Destination (City, Province)</label>
-                            <input type="text" name="destination" id="destination" placeholder="e.g. Angeles City, Pampanga" class="w-full border rounded px-3 py-2 mt-1" required>
-
-                            @error('destination')
+                            {{-- ✅ Show validation error if trip_id is not selected --}}
+                            @error('trip_id')
                             <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                             @enderror
+
                         </div>
 
-                        <div>
-                            <label for="travel_date" class="block font-medium">Travel Date</label>
-                            <input type="date" name="travel_date" id="travel_date" class="w-full border rounded px-3 py-2 mt-1" min="{{ date('Y-m-d') }}" required>
-                        </div>
-
-                        <div>
-                            <label for="travel_time" class="block font-medium">Travel Time</label>
-                            <input type="time" name="travel_time" id="travel_time" class="w-full border rounded px-3 py-2 mt-1" required>
-                        </div>
                     </div>
 
                     <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-bold">
@@ -60,10 +56,11 @@
 
                 @forelse ($bookings as $booking)
                 <div class="p-4 bg-white rounded shadow mb-4">
-                    <p><strong>From:</strong> {{ $booking->origin }}</p>
-                    <p><strong>To:</strong> {{ $booking->destination }}</p>
-                    <p><strong>Date:</strong> {{ $booking->travel_date }}</p>
-                    <p><strong>Time:</strong> {{ $booking->travel_time }}</p>
+                    <p><strong>From:</strong> {{ $booking->trip->origin }}</p>
+                    <p><strong>To:</strong> {{ $booking->trip->destination }}</p>
+                    <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->trip->travel_date)->format('M d, Y') }}</p>
+                    <p><strong>Time:</strong> {{ \Carbon\Carbon::parse($booking->trip->travel_time)->format('h:i A') }}</p>
+
 
                     <form method="POST" action="{{ route('bookings.destroy', $booking->id) }}" class="mt-3">
                         @csrf
@@ -79,22 +76,6 @@
             </div>
 
         </div>
-
-        <script>
-            const form = document.querySelector('form');
-            const originInput = document.getElementById('origin');
-            const destinationInput = document.getElementById('destination');
-
-            form.addEventListener('submit', function(e) {
-                const origin = originInput.value.trim().toLowerCase();
-                const destination = destinationInput.value.trim().toLowerCase();
-
-                if (origin === destination) {
-                    e.preventDefault();
-                    alert('Origin and Destination cannot be the same.');
-                }
-            });
-        </script>
 
     </div>
 

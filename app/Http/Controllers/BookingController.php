@@ -4,24 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Booking;
+use App\Models\Trip;
 
 class BookingController extends Controller
 {
     public function index()
     {
         $bookings = auth()->user()->bookings()->latest()->get();
-        return view('dashboard', compact('bookings'));
+        $trips = Trip::orderBy('travel_date')->get(); // fetch trips
+        return view('dashboard', compact('bookings', 'trips'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'origin' => 'required|string|max:255',
-            'destination' => 'required|string|max:255|different:origin',
-            'travel_date' => 'required|date|after_or_equal:today',
-            'travel_time' => 'required',
-        ], [
-            'destination.different' => 'Origin and Destination must be different.',
+            'trip_id' => 'required|exists:trips,id',
         ]);
 
         auth()->user()->bookings()->create($validated);
