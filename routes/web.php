@@ -8,6 +8,7 @@ Route::get('/', function () {
 });
 
 // ✅ Secure group for authenticated users
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

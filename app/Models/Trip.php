@@ -14,5 +14,7 @@ class Trip extends Model
         'destination',
         'travel_date',
         'travel_time',
+        'bus_name',
+        // add other fields you want to manage
     ];
 }

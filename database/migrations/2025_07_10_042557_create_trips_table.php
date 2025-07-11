@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('origin');
             $table->string('destination');
-            $table->date('travel_date');
-            $table->time('travel_time');
+            $table->date('departure_date');
+            $table->time('departure_time');
+            $table->string('bus_name');
+            $table->integer('seat_capacity');
+            $table->decimal('price', 8, 2);
             $table->timestamps();
         });
     }
