@@ -16,25 +16,29 @@
                     @csrf
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                        <div class="mb-4">
-                            <label for="trip_id" class="block font-medium">Choose a Trip</label>
-                            <select name="trip_id" id="trip_id" class="w-full border rounded px-3 py-2 mt-1" required>
-                                <option value="">-- Select Trip --</option>
-                                {{-- Actual trips --}}
-                                @foreach($trips as $trip)
-                                <option value="{{ $trip->id }}">
-                                    {{ $trip->origin }} to {{ $trip->destination }} on {{ \Carbon\Carbon::parse($trip->travel_date)->format('M d, Y') }} at {{ \Carbon\Carbon::parse($trip->travel_time)->format('h:i A') }}
-                                </option>
-                                @endforeach
-                            </select>
-
-                            {{-- ✅ Show validation error if trip_id is not selected --}}
-                            @error('trip_id')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-
+                        <div>
+                            <label for="origin" class="block font-medium">Origin</label>
+                            <input type="text" name="origin" id="origin" class="w-full border rounded px-3 py-2 mt-1" required>
+                            @error('origin') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
+                        <div>
+                            <label for="destination" class="block font-medium">Destination</label>
+                            <input type="text" name="destination" id="destination" class="w-full border rounded px-3 py-2 mt-1" required>
+                            @error('destination') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label for="travel_date" class="block font-medium">Travel Date</label>
+                            <input type="date" name="travel_date" id="travel_date" class="w-full border rounded px-3 py-2 mt-1" min="{{ now()->toDateString() }}" required>
+                            @error('travel_date') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
+                            <label for="travel_time" class="block font-medium">Travel Time</label>
+                            <input type="time" name="travel_time" id="travel_time" class="w-full border rounded px-3 py-2 mt-1" required>
+                            @error('travel_time') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        </div>
                     </div>
 
                     <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-bold">
@@ -56,11 +60,10 @@
 
                 @forelse ($bookings as $booking)
                 <div class="p-4 bg-white rounded shadow mb-4">
-                    <p><strong>From:</strong> {{ $booking->trip->origin }}</p>
-                    <p><strong>To:</strong> {{ $booking->trip->destination }}</p>
-                    <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->trip->travel_date)->format('M d, Y') }}</p>
-                    <p><strong>Time:</strong> {{ \Carbon\Carbon::parse($booking->trip->travel_time)->format('h:i A') }}</p>
-
+                    <p><strong>From:</strong> {{ $booking->origin }}</p>
+                    <p><strong>To:</strong> {{ $booking->destination }}</p>
+                    <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->travel_date)->format('M d, Y') }}</p>
+                    <p><strong>Time:</strong> {{ \Carbon\Carbon::parse($booking->travel_time)->format('h:i A') }}</p>
 
                     <form method="POST" action="{{ route('bookings.destroy', $booking->id) }}" class="mt-3">
                         @csrf
