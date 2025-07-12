@@ -11,9 +11,6 @@ use App\Http\Middleware\RedirectIfAuthenticated;
 
 class Kernel extends HttpKernel
 {
-    /**
-     * Global HTTP middleware stack.
-     */
     protected $middleware = [
         \Illuminate\Http\Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,
@@ -22,10 +19,6 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
 
-
-    /**
-     * Route middleware groups.
-     */
     protected $middlewareGroups = [
         'web' => [
             EncryptCookies::class,
@@ -43,9 +36,6 @@ class Kernel extends HttpKernel
         ],
     ];
 
-    /**
-     * Route middleware.
-     */
     protected $routeMiddleware = [
         'auth' => Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
@@ -57,7 +47,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
-        // ✅ Custom middleware
+        // ✅ Your custom middleware
+        'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         'admin.only' => \App\Http\Middleware\AdminOnlyMiddleware::class,
     ];
 }

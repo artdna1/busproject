@@ -11,10 +11,11 @@ class Trip extends Model
 
     protected $fillable = [
         'origin',
-        'destination',
-        'travel_date',
-        'travel_time',
-        'bus_name',
-        // add other fields you want to manage
+    'destination',
+    'bus_name',
+    'travel_date',
+    'travel_time',
+    'seat_capacity',
+    'price',
     ];
 }

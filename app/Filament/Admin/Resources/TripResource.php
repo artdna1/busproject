@@ -28,12 +28,13 @@ class TripResource extends Resource
         return $form
             ->schema([
                 TextInput::make('origin')->required(),
-                TextInput::make('destination')->required(),
-                DatePicker::make('departure_date')->required(),
-                TimePicker::make('departure_time')->required(),
-                TextInput::make('bus_name')->required(),
-                TextInput::make('seat_capacity')->numeric()->required(),
-                TextInput::make('price')->numeric()->required(),
+        TextInput::make('destination')->required(),
+        DatePicker::make('travel_date')->required(),
+        TimePicker::make('travel_time')->required(),
+        TextInput::make('bus_name')->required(),
+        TextInput::make('seat_capacity')->numeric()->required(),
+        TextInput::make('price')->numeric()->required(),
+                
             ]);
     }
 
@@ -49,6 +50,7 @@ class TripResource extends Resource
                 TextColumn::make('seat_capacity'),
                 TextColumn::make('price')->money('PHP'),
                 TextColumn::make('created_at')->label('Created')->since(),
+                
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
