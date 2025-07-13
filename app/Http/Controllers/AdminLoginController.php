@@ -29,14 +29,18 @@ class AdminLoginController extends Controller
         // ✅ Attempt login
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            // ✅ Regenerate session to prevent fixation
-            $request->session()->regenerate();
+       if (Auth::attempt($credentials)) {
+    $request->session()->regenerate();
 
-            // ✅ Redirect to dashboard route
-            return redirect()->intended('/admin/dashboard');
-        }
+    if (auth()->user()->role === 'admin' && auth()->user()->status !== 'approved') {
+        Auth::logout();
+        return redirect()->route('admin.login')->withErrors([
+            'email' => 'Your account is not yet approved by a Company',
+        ]);
+    }
 
+    return redirect()->intended('/admin/dashboard');
+}
         // ❌ Invalid login attempt
         return back()->withErrors([
             'email' => 'Invalid credentials.',

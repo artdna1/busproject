@@ -42,6 +42,10 @@ class BookingResource extends Resource
                 TimePicker::make('travel_time')->required(),
             ]);
     }
+public static function canAccess(): bool
+{
+    return auth()->user()?->role === 'admin';
+}
 
     public static function table(Table $table): Table
     {

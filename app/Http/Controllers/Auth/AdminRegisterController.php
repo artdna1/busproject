@@ -24,11 +24,12 @@ class AdminRegisterController extends Controller
 
         // Create new admin user
         User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'role'     => 'admin', // Set admin role here
-        ]);
+    'name' => $request->name,
+    'email' => $request->email,
+    'password' => Hash::make($request->password),
+    'role' => 'admin',
+    'status' => 'pending',
+]);
 
         return redirect()->route('admin.login')->with('success', 'Admin account registered.');
     }

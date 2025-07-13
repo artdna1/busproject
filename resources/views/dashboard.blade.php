@@ -8,13 +8,18 @@
     <div class="py-8">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
+            {{-- Flash Success Message --}}
+            @if(session('success'))
+            <div class="bg-green-100 text-green-800 p-4 rounded mb-6 font-semibold">
+                {{ session('success') }}
+            </div>
+            @endif
+
             {{-- Booking Form --}}
             <div class="bg-white p-6 rounded shadow mb-10">
                 <h2 class="text-2xl font-semibold mb-6">Start Booking Here</h2>
-
                 <form method="POST" action="{{ route('bookings.store') }}">
                     @csrf
-
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label for="origin" class="block font-medium">Origin</label>
@@ -47,13 +52,6 @@
                 </form>
             </div>
 
-            {{-- Flash Message --}}
-            @if(session('success'))
-            <div class="text-green-600 mb-6 font-semibold">
-                {{ session('success') }}
-            </div>
-            @endif
-
             {{-- Bookings List --}}
             <div>
                 <h2 class="text-2xl font-semibold mb-4">My Bookings</h2>
@@ -79,7 +77,5 @@
             </div>
 
         </div>
-
     </div>
-
 </x-app-layout>

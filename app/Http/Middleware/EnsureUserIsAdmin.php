@@ -22,9 +22,13 @@ class EnsureUserIsAdmin
             'role' => optional($user)->role,
         ]);
 
-        if (! $user || !in_array($user->role, ['admin', 'super_admin'])) {
-            abort(403, 'Unauthorized access.');
-        }
+         // app/Http/Middleware/EnsureUserIsAdmin.php
+if ($user && $user->role !== 'super_admin' && $user->status !== 'approved') {
+    Auth::logout();
+    abort(403, 'Your account is not yet approved.');
+}
+
+
 
         return $next($request);
     }

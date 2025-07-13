@@ -63,8 +63,8 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                  \Filament\Http\Middleware\Authenticate::class,
-    \App\Http\Middleware\EnsureUserIsAdmin::class,
+                  Authenticate::class,
+                  EnsureUserIsAdmin::class,
                 
             ]);
     }
