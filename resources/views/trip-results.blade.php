@@ -22,7 +22,7 @@
 
         {{-- Trip Results --}}
         @forelse ($trips as $trip)
-        <div class="bg-white p-6 rounded shadow mb-5 text-left max-w-2xl mx-auto">
+        <div class="bg-white p-6 rounded shadow mb-8 text-left max-w-2xl mx-auto">
             <p><strong>From:</strong> {{ $trip->origin }}</p>
             <p><strong>To:</strong> {{ $trip->destination }}</p>
             <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($trip->travel_date)->format('M d, Y') }}</p>
