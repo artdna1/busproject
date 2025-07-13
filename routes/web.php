@@ -5,6 +5,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\Auth\AdminRegisterController;
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Controllers\TripSearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +48,8 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', [BookingController::class, 'index'])->name('dashboard');
+    Route::get('/search-trips', [TripSearchController::class, 'showForm'])->name('trips.search');
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::delete('/bookings/{id}', [BookingController::class, 'destroy'])->name('bookings.destroy');
-
+    Route::get('/search-trips/results', [TripSearchController::class, 'search'])->name('trips.search.results');
 });
