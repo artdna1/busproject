@@ -6,24 +6,31 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Trip;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
     public function index()
     {
-        return view('dashboard'); // no more compact('bookings')
+        return view('dashboard');
+    }
+
+    public function list()
+    {
+        $bookings = Booking::where('user_id', Auth::id())->latest()->get();
+        return view('my-bookings', compact('bookings'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'trip_id' => 'required|exists:trips,id',
         ]);
 
-        $trip = Trip::findOrFail($validated['trip_id']);
+        $trip = Trip::findOrFail($request->trip_id);
 
-        $alreadyBooked = Booking::where('user_id', auth()->id())
+        $userId = Auth::id();
+
+        $alreadyBooked = Booking::where('user_id', $userId)
             ->where('trip_id', $trip->id)
             ->exists();
 
@@ -32,7 +39,7 @@ class BookingController extends Controller
         }
 
         Booking::create([
-            'user_id' => auth()->id(),
+            'user_id' => $userId,
             'trip_id' => $trip->id,
             'origin' => $trip->origin,
             'destination' => $trip->destination,
@@ -40,7 +47,7 @@ class BookingController extends Controller
             'travel_time' => $trip->travel_time,
         ]);
 
-        return redirect()->back()->with('success', 'Bus booked successfully!');
+        return back()->with('success', 'Bus booked successfully!');
     }
 
     public function destroy($id)
@@ -48,6 +55,6 @@ class BookingController extends Controller
         $booking = Booking::where('user_id', Auth::id())->findOrFail($id);
         $booking->delete();
 
-        return redirect()->route('dashboard')->with('success', 'Booking cancelled.');
+        return redirect()->route('bookings.list')->with('success', 'Booking cancelled.');
     }
 }

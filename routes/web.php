@@ -52,4 +52,5 @@ Route::middleware([
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::delete('/bookings/{id}', [BookingController::class, 'destroy'])->name('bookings.destroy');
     Route::get('/search-trips/results', [TripSearchController::class, 'search'])->name('trips.search.results');
+    Route::get('/my-bookings', [BookingController::class, 'list'])->name('bookings.list');
 });
