@@ -9,17 +9,18 @@ use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
+    /**
+     * Show the dashboard with available trips.
+     */
     public function index()
     {
-        return view('dashboard');
+        $trips = Trip::orderBy('travel_date')->get(); // Load all trips
+        return view('dashboard', compact('trips'));
     }
 
-    public function list()
-    {
-        $bookings = Booking::where('user_id', Auth::id())->latest()->get();
-        return view('my-bookings', compact('bookings'));
-    }
-
+    /**
+     * Handle booking submission.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -27,9 +28,13 @@ class BookingController extends Controller
         ]);
 
         $trip = Trip::findOrFail($request->trip_id);
-
         $userId = Auth::id();
 
+        // Log booking attempt
+        \Log::info('Booking attempt by user ID: ' . $userId);
+        \Log::info('Trip info: ', $trip->toArray());
+
+        // Check if already booked
         $alreadyBooked = Booking::where('user_id', $userId)
             ->where('trip_id', $trip->id)
             ->exists();
@@ -38,6 +43,12 @@ class BookingController extends Controller
             return back()->withErrors(['trip_id' => 'You already booked this trip.']);
         }
 
+        // Use seatsAvailable() method to check availability
+        if ($trip->seatsAvailable() < 1) {
+            return back()->withErrors(['trip_id' => 'Sorry, no more seats available for this trip.']);
+        }
+
+        // Create booking
         Booking::create([
             'user_id' => $userId,
             'trip_id' => $trip->id,
@@ -45,14 +56,33 @@ class BookingController extends Controller
             'destination' => $trip->destination,
             'travel_date' => $trip->travel_date,
             'travel_time' => $trip->travel_time,
+            'status' => 'pending',
         ]);
 
-        return back()->with('success', 'Bus booked successfully!');
+        // Log success
+        \Log::info('Booking created successfully for user ID: ' . $userId);
+
+        return redirect()->route('bookings.list')->with('success', 'Bus booked successfully!');
     }
 
+    /**
+     * Show list of the logged-in user's bookings.
+     */
+    public function list()
+    {
+        $bookings = Booking::where('user_id', Auth::id())->latest()->get();
+        return view('my-bookings', compact('bookings'));
+    }
+
+    /**
+     * Cancel (delete) a booking.
+     */
     public function destroy($id)
     {
         $booking = Booking::where('user_id', Auth::id())->findOrFail($id);
+
+        // No need to manually increment seats_available, as availability is dynamic
+
         $booking->delete();
 
         return redirect()->route('bookings.list')->with('success', 'Booking cancelled.');

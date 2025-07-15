@@ -27,21 +27,31 @@ class BookingResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Select::make('user_id')
-                    ->label('Booked By')
-                    ->relationship('user', 'name') // assumes 'name' column exists
-                    ->searchable()
-                    ->required(),
+{
+    return $form
+        ->schema([
+            Select::make('user_id')
+                ->label('Booked By')
+                ->relationship('user', 'name')
+                ->searchable()
+                ->required(),
 
-                TextInput::make('origin')->required(),
-                TextInput::make('destination')->required(),
-                DatePicker::make('travel_date')->required(),
-                TimePicker::make('travel_time')->required(),
-            ]);
-    }
+            TextInput::make('origin')->required(),
+            TextInput::make('destination')->required(),
+            DatePicker::make('travel_date')->required(),
+            TimePicker::make('travel_time')->required(),
+
+            Select::make('status')
+                ->required()
+                ->options([
+                    'pending' => 'Pending',
+                    'approved' => 'Approved',
+                    'cancelled' => 'Cancelled',
+                ])
+                ->label('Booking Status'),
+        ]);
+}
+
 public static function canAccess(): bool
 {
     return auth()->user()?->role === 'admin';

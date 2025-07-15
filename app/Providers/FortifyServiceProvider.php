@@ -4,16 +4,19 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
+use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Fortify\Fortify;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
+use App\Actions\Fortify\CreateNewUser;
 
 class FortifyServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        //
+        // Bind the interface to your concrete class
+        $this->app->singleton(CreatesNewUsers::class, CreateNewUser::class);
     }
 
     public function boot()
@@ -23,7 +26,7 @@ class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($request->email . $request->ip());
         });
 
-        // Custom login view (optional)
+        // Custom login view
         Fortify::loginView(function () {
             return view('auth.login');
         });

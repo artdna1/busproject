@@ -16,4 +16,10 @@ class EditUser extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    // ✅ Add this method to redirect after save
+    protected function getRedirectUrl(): string
+    {
+        return UserResource::getUrl(); // this goes to /admin/users
+    }
 }

@@ -18,6 +18,7 @@ class Booking extends Model
         'destination',
         'travel_date',
         'travel_time',
+         'status',
     ];
 
     public function user()

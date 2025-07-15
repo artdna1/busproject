@@ -28,15 +28,19 @@
             <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($trip->travel_date)->format('M d, Y') }}</p>
             <p><strong>Time:</strong> {{ \Carbon\Carbon::parse($trip->travel_time)->format('h:i A') }}</p>
             <p><strong>Price:</strong> ₱{{ number_format($trip->price, 2) }}</p>
-            <p><strong>Seats:</strong> {{ $trip->seat_capacity }}</p>
+            <p><strong>Seats Available:</strong> {{ $trip->seatsAvailable() }}</p>
 
-            <form method="POST" action="{{ route('bookings.store') }}" class="mt-4">
-                @csrf
-                <input type="hidden" name="trip_id" value="{{ $trip->id }}">
-                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded">
-                    Book This Trip
-                </button>
-            </form>
+            @if($trip->seatsAvailable() > 0)
+                <form method="POST" action="{{ route('bookings.store') }}" class="mt-4">
+                    @csrf
+                    <input type="hidden" name="trip_id" value="{{ $trip->id }}">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded">
+                        Book This Trip
+                    </button>
+                </form>
+            @else
+                <p class="text-red-600 font-semibold mt-2">No seats available</p>
+            @endif
         </div>
         @empty
         <p class="text-gray-600">No trips found.</p>
