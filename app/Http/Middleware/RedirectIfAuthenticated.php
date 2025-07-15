@@ -8,14 +8,18 @@ use Illuminate\Support\Facades\Auth;
 
 class RedirectIfAuthenticated
 {
-    public function handle(Request $request, Closure $next, ...$guards)
+    public function handle($request, Closure $next, ...$guards)
     {
-        $guards = empty($guards) ? [null] : $guards;
+        $guard = $guards[0] ?? null;
 
-        foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                return redirect('/dashboard');
+        if (Auth::guard($guard)->check()) {
+            $role = Auth::user()->role;
+
+            if (in_array($role, ['admin', 'super_admin'])) {
+                return redirect()->route('admin.dashboard');
             }
+
+            return redirect()->route('dashboard');
         }
 
         return $next($request);

@@ -1,14 +1,12 @@
-@extends('layouts.app')
-
-@section('content')
+<x-guest-layout>
     <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100">
         <div class="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <h2 class="text-2xl font-bold mb-6 text-center">Admin Login</h2>
 
             @if ($errors->any())
-                <div class="mb-4 text-red-600">
-                    {{ $errors->first() }}
-                </div>
+            <div class="mb-4 text-red-600">
+                {{ $errors->first() }}
+            </div>
             @endif
 
             <form method="POST" action="{{ route('admin.login') }}">
@@ -37,4 +35,4 @@
             </form>
         </div>
     </div>
-@endsection
+</x-guest-layout>

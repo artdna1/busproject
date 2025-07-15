@@ -14,8 +14,21 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $trips = Trip::orderBy('travel_date')->get(); // Load all trips
-        return view('dashboard', compact('trips'));
+        try {
+            $trips = Trip::withCount([
+                'bookings as approved_bookings_count' => function ($query) {
+                    $query->where('status', 'approved');
+                }
+            ])->orderBy('travel_date')->get();
+
+            return view('dashboard', compact('trips'));
+        } catch (\Exception $e) {
+            \Log::error('Dashboard loading error: ' . $e->getMessage());
+            return view('dashboard')->with([
+                'trips' => collect(),
+                'error' => 'Failed to load trips: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -43,8 +56,13 @@ class BookingController extends Controller
             return back()->withErrors(['trip_id' => 'You already booked this trip.']);
         }
 
-        // Use seatsAvailable() method to check availability
-        if ($trip->seatsAvailable() < 1) {
+        $approvedCount = Booking::where('trip_id', $trip->id)
+            ->where('status', 'approved')
+            ->count();
+
+        $seatsLeft = $trip->seat_capacity - $approvedCount;
+
+        if ($seatsLeft < 1) {
             return back()->withErrors(['trip_id' => 'Sorry, no more seats available for this trip.']);
         }
 

@@ -4,13 +4,11 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\TripResource\Pages;
 use App\Models\Trip;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TimePicker;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 
@@ -20,17 +18,11 @@ class TripResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    /**
-     * Only allow admins to access this resource.
-     */
     public static function canAccess(): bool
     {
-        return auth()->user()?->role === 'admin';
+        return in_array(auth()->user()?->role, ['admin', 'super_admin']);
     }
 
-    /**
-     * Trip form schema for create/edit pages.
-     */
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -44,35 +36,30 @@ class TripResource extends Resource
         ]);
     }
 
-    /**
-     * Trip table listing in admin.
-     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-              Tables\Columns\TextColumn::make('origin')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('destination')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('travel_date')->date(),
-            Tables\Columns\TextColumn::make('travel_time'),
-            Tables\Columns\TextColumn::make('bus_name'),
-            Tables\Columns\TextColumn::make('seat_capacity'),
-            Tables\Columns\TextColumn::make('price')->money('PHP'),
-            Tables\Columns\TextColumn::make('created_at')->since(),
+                TextColumn::make('origin')->sortable()->searchable(),
+                TextColumn::make('destination')->sortable()->searchable(),
+                TextColumn::make('travel_date')->date(),
+                TextColumn::make('travel_time'),
+                TextColumn::make('bus_name'),
+                TextColumn::make('seat_capacity'),
+                TextColumn::make('price')->money('PHP'),
+                TextColumn::make('created_at')->since(),
 
-            // 👇 This is what you add
-            Tables\Columns\TextColumn::make('available_seats')
-                ->label('Available Seats')
-               
+                TextColumn::make('available_seats')
+                    ->label('Available Seats')
+                    ->getStateUsing(fn($record) => $record->seatsAvailable()), // or remove if you have an accessor
             ])
             ->defaultSort('created_at', 'desc')
-            ->filters([])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                \Filament\Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                \Filament\Tables\Actions\BulkActionGroup::make([
+                    \Filament\Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

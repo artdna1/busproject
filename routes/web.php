@@ -5,44 +5,30 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\Auth\AdminRegisterController;
 use App\Http\Controllers\TripSearchController;
-use App\Http\Controllers\AdminTripController;
-use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
-// Public welcome page
-Route::get('/', function () {
-    return view('welcome');
+// ✅ Welcome Page
+Route::get('/', fn() => view('welcome'));
+
+// ✅ Admin Registration/Login (Not handled by Filament)
+Route::middleware('guest')->group(function () {
+    Route::get('/admin/register', [AdminRegisterController::class, 'showRegistrationForm'])->name('admin.register');
+    Route::post('/admin/register', [AdminRegisterController::class, 'register'])->name('admin.register.submit');
+    Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
 });
 
-// Admin Registration & Login
-Route::get('/admin/register', [AdminRegisterController::class, 'showRegistrationForm'])->name('admin.register');
-Route::post('/admin/register', [AdminRegisterController::class, 'register'])->name('admin.register.submit');
-Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
-
-// Admin-only routes
-Route::middleware(['auth', EnsureUserIsAdmin::class])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
-
-        Route::get('/trips', [AdminTripController::class, 'showTrips'])->name('trips');
-        // other admin routes...
-    });
-
-// Email verification
+// ✅ Email Verification (for users only)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/email/verify', function () {
-        return view('auth.verify-email');
-    })->name('verification.notice');
+    Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
 
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
         $request->fulfill();
-        return redirect('/dashboard'); // or '/admin' based on role
+
+        return in_array($request->user()->role, ['admin', 'super_admin'])
+            ? redirect('/admin')
+            : redirect()->route('dashboard');
     })->middleware(['signed'])->name('verification.verify');
 
     Route::post('/email/verification-notification', function (Request $request) {
@@ -51,7 +37,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('verification.send');
 });
 
-// Authenticated user routes
+// ✅ User Routes (Only if email verified)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [BookingController::class, 'index'])->name('dashboard');
     Route::get('/search-trips', [TripSearchController::class, 'showForm'])->name('trips.search');

@@ -20,28 +20,42 @@ class AdminLoginController extends Controller
      */
     public function login(Request $request)
     {
-        // ✅ Validate input
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // ✅ Attempt login
         $credentials = $request->only('email', 'password');
 
-       if (Auth::attempt($credentials)) {
-    $request->session()->regenerate();
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
 
-    if (auth()->user()->role === 'admin' && auth()->user()->status !== 'approved') {
-        Auth::logout();
-        return redirect()->route('admin.login')->withErrors([
-            'email' => 'Your account is not yet approved by a Company',
-        ]);
-    }
+            $user = auth()->user();
 
-    return redirect()->intended('/admin/dashboard');
+            if (!in_array($user->role, ['admin', 'super_admin'])) {
+    Auth::logout();
+    return redirect()->route('login')->withErrors([
+        'email' => 'Access denied: You are not an admin.',
+    ]);
 }
-        // ❌ Invalid login attempt
+
+if ($user->status !== 'approved') {
+    Auth::logout();
+    return redirect()->route('admin.login')->withErrors([
+        'email' => 'Your account is not yet approved by a Company.',
+    ]);
+}
+
+return redirect('/admin');
+            }
+
+            // Optional fallback for non-admins (just in case)
+            Auth::logout();
+            return redirect()->route('login')->withErrors([
+                'email' => 'Access denied: You are not an admin.',
+            ]);
+        }
+
         return back()->withErrors([
             'email' => 'Invalid credentials.',
         ])->withInput();
