@@ -16,10 +16,4 @@ class EditTrip extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-
-    // ✅ Redirect to Trip list page
-    protected function getRedirectUrl(): string
-    {
-        return TripResource::getUrl(); // 👈 This returns '/admin/trips'
-    }
 }

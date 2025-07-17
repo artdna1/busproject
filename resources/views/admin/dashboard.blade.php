@@ -1,8 +1,8 @@
-{{-- resources/views/admin/dashboard.blade.php --}}
+<!-- {{-- resources/views/admin/dashboard.blade.php --}}
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold">
+        <h2 class="text-xl font-semibold text-gray-800 leading-tight">
             {{ __('Admin Dashboard') }}
         </h2>
     </x-slot>
@@ -15,4 +15,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app-layout> -->

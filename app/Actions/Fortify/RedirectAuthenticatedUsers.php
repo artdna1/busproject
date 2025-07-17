@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RedirectAuthenticatedUsers
 {
-    public function __invoke()
+    public function __invoke($request)
     {
         $user = Auth::user();
 

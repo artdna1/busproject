@@ -2,11 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\Resources\TripResource;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Pages;
 use Filament\Widgets;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -18,6 +18,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Support\Facades\Route;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -28,6 +29,14 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->colors([
                 'primary' => Color::Amber,
+            ])
+            ->routes(function () {
+                Route::get('/', function () {
+                    return redirect()->to(route('filament.admin.resources.trips.index'));
+                });
+            })
+            ->resources([
+                TripResource::class,
             ])
             ->discoverResources(
                 in: app_path('Filament/Admin/Resources'),
@@ -41,9 +50,6 @@ class AdminPanelProvider extends PanelProvider
                 in: app_path('Filament/Admin/Widgets'),
                 for: 'App\\Filament\\Admin\\Widgets',
             )
-            ->pages([
-                Pages\Dashboard::class,
-            ])
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,

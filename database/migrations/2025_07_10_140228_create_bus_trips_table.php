@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('bus_trips', function (Blueprint $table) {
+            $table->id();
+            $table->string('bus_name');
+            $table->string('origin');
+            $table->string('destination');
+            $table->dateTime('departure_time');
+            $table->dateTime('arrival_time')->nullable();
+            $table->decimal('price', 8, 2);
+            $table->integer('seats_available');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('bus_trips');
+    }
+};

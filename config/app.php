@@ -37,7 +37,7 @@ return [
         // App\Providers\EventServiceProvider::class,
         // App\Providers\RouteServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
-
+        Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
     ],
 
     /*
@@ -103,7 +103,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------

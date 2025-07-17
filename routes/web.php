@@ -7,11 +7,14 @@ use App\Http\Controllers\Auth\AdminRegisterController;
 use App\Http\Controllers\TripSearchController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\TripController;
 
-// ✅ Welcome Page
+// Home
 Route::get('/', fn() => view('welcome'));
 
-// ✅ Admin Registration/Login (Not handled by Filament)
+// Admin Registration/Login
 Route::middleware('guest')->group(function () {
     Route::get('/admin/register', [AdminRegisterController::class, 'showRegistrationForm'])->name('admin.register');
     Route::post('/admin/register', [AdminRegisterController::class, 'register'])->name('admin.register.submit');
@@ -19,7 +22,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
 });
 
-// ✅ Email Verification (for users only)
+// Email Verification
 Route::middleware(['auth'])->group(function () {
     Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
 
@@ -33,11 +36,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/email/verification-notification', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
+
         return back()->with('message', 'Verification link sent!');
     })->name('verification.send');
 });
 
-// ✅ User Routes (Only if email verified)
+// User Dashboard & Bookings
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [BookingController::class, 'index'])->name('dashboard');
     Route::get('/search-trips', [TripSearchController::class, 'showForm'])->name('trips.search');
@@ -46,3 +50,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/bookings/{id}', [BookingController::class, 'destroy'])->name('bookings.destroy');
     Route::get('/my-bookings', [BookingController::class, 'list'])->name('bookings.list');
 });
+
+// PayPal
+Route::get('/pay/{trip}', [PayPalController::class, 'pay'])->name('paypal.pay');
+Route::get('/paypal/success', [PayPalController::class, 'success'])->name('paypal.success');
+Route::get('/paypal/cancel', [PayPalController::class, 'cancel'])->name('paypal.cancel');
+
+Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+    Route::post('/trips', [TripController::class, 'store'])->name('trips.store');
+    Route::delete('/trips/{id}', [TripController::class, 'destroy'])->name('trips.destroy');
+});
+
+// ✅ NOTE: No need to manually define Filament admin routes here.
+// Filament auto-registers them under /admin via its own config.

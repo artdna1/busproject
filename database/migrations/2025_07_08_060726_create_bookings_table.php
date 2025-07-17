@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('travel_date');
             $table->time('travel_time');
             $table->timestamps();
+            $table->string('seat_number')->nullable();
         });
     }
 

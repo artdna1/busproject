@@ -9,6 +9,7 @@
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
             {{-- Flash Success Message --}}
             @if(session('success'))
                 <div class="bg-green-100 text-green-800 p-4 rounded font-semibold text-center">
@@ -24,6 +25,7 @@
                         <p><strong>To:</strong> {{ $booking->destination }}</p>
                         <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->travel_date)->format('M d, Y') }}</p>
                         <p><strong>Time:</strong> {{ \Carbon\Carbon::parse($booking->travel_time)->format('h:i A') }}</p>
+                        <p><strong>Seat Number:</strong> {{ $booking->seat_number }}</p>
                         <p><strong>Status:</strong>
                             <span class="px-2 py-1 rounded-full text-sm font-semibold
                                 @if($booking->status === 'approved') bg-green-100 text-green-800
@@ -35,7 +37,12 @@
                             </span>
                         </p>
                     </div>
-
+<p><strong>Payment Method:</strong> {{ $booking->payment_method }}</p>
+<p><strong>Seat:</strong> {{ $booking->seat_number }}</p>
+<p><strong>Payment Status:</strong> {{ ucfirst($booking->payment_status) }}</p>
+@if($booking->payment_proof)
+    <p><a href="{{ asset('storage/' . $booking->payment_proof) }}" target="_blank" class="text-blue-600 underline">View Payment Proof</a></p>
+@endif
                     @if($booking->status !== 'cancelled')
                         <form method="POST" action="{{ route('bookings.destroy', $booking->id) }}" class="mt-4 text-center">
                             @csrf
@@ -43,7 +50,7 @@
                             <button onclick="return confirm('Are you sure you want to cancel this booking?')"
                                 type="submit"
                                 class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded">
-                                Cancel
+                                Cancel Booking
                             </button>
                         </form>
                     @endif

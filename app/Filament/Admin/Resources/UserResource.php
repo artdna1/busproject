@@ -26,6 +26,7 @@ class UserResource extends Resource
             ->schema([
                 TextInput::make('name')->required(),
                 TextInput::make('email')->email()->required(),
+
                 Select::make('role')
                     ->options([
                         'admin' => 'Admin',
@@ -34,17 +35,25 @@ class UserResource extends Resource
                     ])
                     ->required(),
 
-               
-Select::make('status')
-    ->options([
-        'pending' => 'Pending',
-        'approved' => 'Approved',
-        'declined' => 'Declined',
-    ])
-    ->default('pending')
-    ->visible(fn () => auth()->user()?->role === 'super_admin'),
+                Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'approved' => 'Approved',
+                        'declined' => 'Declined',
+                    ])
+                    ->default('pending')
+                    ->visible(fn() => auth()->user()?->role === 'super_admin'),
+
+                TextInput::make('password')
+                    ->label('Password')
+                    ->password()
+                    ->required(fn(string $context): bool => $context === 'create')
+                    ->dehydrated(fn($state) => filled($state))
+                    ->dehydrateStateUsing(fn($state) => \Illuminate\Support\Facades\Hash::make($state))
+                    ->maxLength(255),
             ]);
     }
+
 
     public static function table(Table $table): Table
     {

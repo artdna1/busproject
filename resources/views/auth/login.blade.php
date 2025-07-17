@@ -7,9 +7,9 @@
         <x-validation-errors class="mb-4" />
 
         @if (session('status'))
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ session('status') }}
-        </div>
+            <div class="mb-4 font-medium text-sm text-green-600">
+                {{ session('status') }}
+            </div>
         @endif
 
         <form method="POST" action="{{ route('login') }}">
@@ -32,11 +32,19 @@
                 </label>
             </div>
 
+            {{-- ✅ Google reCAPTCHA v2 --}}
+            <div class="mt-4">
+                {!! NoCaptcha::display() !!}
+                @error('g-recaptcha-response')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
+
             <div class="flex items-center justify-end mt-4">
                 @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
+                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                        {{ __('Forgot your password?') }}
+                    </a>
                 @endif
 
                 <x-button class="ms-4">
@@ -44,5 +52,8 @@
                 </x-button>
             </div>
         </form>
+
+        {{-- ✅ Load reCAPTCHA JS --}}
+        {!! NoCaptcha::renderJs() !!}
     </x-authentication-card>
 </x-guest-layout>
