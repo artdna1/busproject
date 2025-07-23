@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Admin\Resources\TripResource;
+use App\Filament\Admin\Pages\Dashboard;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -18,7 +19,6 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Support\Facades\Route;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -30,11 +30,13 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->routes(function () {
-                Route::get('/', function () {
-                    return redirect()->to(route('filament.admin.resources.trips.index'));
-                });
-            })
+            // ✅ This is the correct way to set the default landing page
+            ->default(Dashboard::class)
+
+            ->pages([
+                Dashboard::class,
+            ])
+
             ->resources([
                 TripResource::class,
             ])

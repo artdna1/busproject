@@ -31,15 +31,36 @@
             <p><strong>Seats Available:</strong> {{ $trip->seatsAvailable() }}</p>
 
             @if($trip->seatsAvailable() > 0)
-                <form method="POST" action="{{ route('bookings.store') }}" class="mt-4">
-                    @csrf
-                    <input type="hidden" name="trip_id" value="{{ $trip->id }}">
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded">
-                        Book This Trip
-                    </button>
-                </form>
+            <form method="POST" action="{{ route('bookings.store') }}" class="mt-4">
+                @csrf
+                <input type="hidden" name="trip_id" value="{{ $trip->id }}">
+
+                {{-- Seat Number --}}
+                <div class="mb-4">
+                    <label for="seat_number" class="block font-semibold mb-1">Seat Number</label>
+                    <input type="text" name="seat_number" id="seat_number" required class="w-full border rounded px-3 py-2">
+                </div>
+
+                {{-- Payment Method --}}
+                <div class="mb-4">
+                    <label for="payment_method" class="block font-semibold mb-1">Payment Method</label>
+                    <select name="payment_method" id="payment_method" required class="w-full border rounded px-3 py-2">
+                        <option value="">-- Select --</option>
+                        <option value="GCash">GCash</option>
+                        <option value="BankTransfer">Bank Transfer</option>
+                        <option value="PayMaya">PayMaya</option>
+                        <option value="ShopeePay">ShopeePay</option>
+                        <option value="GrabPay">GrabPay</option>
+                        <option value="Coins.ph">Coins.ph</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded">
+                    Book This Trip
+                </button>
+            </form>
             @else
-                <p class="text-red-600 font-semibold mt-2">No seats available</p>
+            <p class="text-red-600 font-semibold mt-2">No seats available</p>
             @endif
         </div>
         @empty
