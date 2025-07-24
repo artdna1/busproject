@@ -11,7 +11,7 @@
     <div class="py-8 bg-blue-50 min-h-screen">
         <div class="max-w-6xl mx-auto space-y-8 px-4">
 
-            {{-- Flash Success Message --}}
+            {{-- Flash Message --}}
             @if(session('success'))
                 <div class="bg-green-100 border border-green-300 text-green-800 p-4 rounded-lg shadow text-center">
                     {{ session('success') }}
@@ -68,62 +68,48 @@
                                     </div>
                                 </div>
 
-                                {{-- PayPal Button --}}
-                                <div class="text-center mt-4">
-                                    @if($trip->price > 0)
-                                        <form action="{{ route('paypal.pay', $trip->id) }}" method="GET">
-                                            <button type="submit"
-                                                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-6 py-2 rounded shadow transition duration-200">
-                                                Pay with PayPal
-                                            </button>
-                                        </form>
-                                    @else
-                                        <p class="text-green-600 font-semibold mt-2">Free trip – no payment needed.</p>
-                                    @endif
-                                </div>
-
                                 {{-- Booking Form --}}
                                 @if($availableSeats > 0)
                                     <form method="POST" action="{{ route('bookings.store') }}" class="mt-6 space-y-4">
                                         @csrf
                                         <input type="hidden" name="trip_id" value="{{ $trip->id }}">
 
-                                        {{-- Seat Selection --}}
+                                        {{-- Seat Number Dropdown --}}
                                         <div class="text-center">
-                                            <label class="block font-semibold mb-1">Choose Your Seat:</label>
-                                            <select name="seat_number" required
-                                                    class="w-full md:w-1/3 mx-auto px-3 py-2 border border-gray-300 rounded">
-                                                @for ($i = 1; $i <= $trip->seat_capacity; $i++)
-                                                    @php $seat = 'S' . $i; @endphp
-                                                    <option value="{{ $seat }}" {{ in_array($seat, $bookedSeats) ? 'disabled' : '' }}>
-                                                        {{ $seat }} {{ in_array($seat, $bookedSeats) ? '(Taken)' : '' }}
-                                                    </option>
-                                                @endfor
+                                            <label class="block font-semibold mb-1">Seat Number</label>
+                                            <select name="seat_number" required class="w-full md:w-1/3 mx-auto px-3 py-2 border border-gray-300 rounded">
+                                                <option value="" disabled selected>-- Select Seat --</option>
+                                                @foreach (range(1, $trip->seat_capacity) as $i)
+                                                    @php
+                                                        $seat = 'S' . $i;
+                                                    @endphp
+                                                    @if (in_array($seat, $bookedSeats))
+                                                        <option value="" disabled>{{ $seat }} (Taken)</option>
+                                                    @else
+                                                        <option value="{{ $seat }}">{{ $seat }}</option>
+                                                    @endif
+                                                @endforeach
                                             </select>
                                         </div>
 
-                                        {{-- Payment Method --}}
-                                        <div>
-                                            <label class="block font-semibold mb-2">Other Payment Method:</label>
-                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                                        {{-- Payment Method Dropdown --}}
+                                        <div class="text-center">
+                                            <label class="block font-semibold mb-1">Payment Method</label>
+                                            <select name="payment_method" required class="w-full md:w-1/3 mx-auto px-3 py-2 border border-gray-300 rounded">
+                                                <option value="" disabled selected>-- Select --</option>
                                                 @foreach (['GCash', 'BankTransfer', 'PayMaya', 'ShopeePay', 'GrabPay', 'Coins.ph'] as $method)
-                                                    <label class="flex items-center space-x-2">
-                                                        <input type="radio" name="payment_method" value="{{ $method }}" required>
-                                                        <span>{{ $method }}</span>
-                                                    </label>
+                                                    <option value="{{ $method }}">{{ $method }}</option>
                                                 @endforeach
-                                            </div>
+                                            </select>
                                         </div>
 
-                                       <!-- Book Button -->
-<div class="text-center">
-    <button
-        type="submit"
-        class="w-full md:w-auto bg-blue-900 hover:bg-blue-950 text-white font-bold px-6 py-2 rounded-xl shadow-lg transition duration-200"
-    >
-        🚍 Book This Trip
-    </button>
-</div>
+                                        {{-- Submit Button --}}
+                                        <div class="text-center">
+                                            <button type="submit"
+                                                    class="w-full md:w-auto bg-blue-900 hover:bg-blue-950 text-white font-bold px-6 py-2 rounded-xl shadow-lg transition duration-200">
+                                                🚍 Book This Trip
+                                            </button>
+                                        </div>
                                     </form>
                                 @else
                                     <p class="text-red-500 font-semibold text-center mt-4">No seats available</p>
@@ -133,7 +119,7 @@
                     </div>
                 </div>
             @else
-                <p class="text-center text-gray-500">No trips available at the moment.</p>
+                <p class="text-center text-gray-600 font-medium mt-10">No trips available today.</p>
             @endif
         </div>
     </div>

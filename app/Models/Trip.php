@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
-use App\Models\Booking;
 
 class Trip extends Model
 {
@@ -24,7 +22,7 @@ class Trip extends Model
     // Relationships
     public function bookings()
     {
-        return $this->hasMany(Booking::class);
+        return $this->hasMany(\App\Models\Booking::class);
     }
 
     public function approvedBookings()
@@ -32,30 +30,35 @@ class Trip extends Model
         return $this->bookings()->where('status', 'approved');
     }
 
-    // Accessors / Helpers
+    // ✅ Method-style seat availability
     public function seatsAvailable()
     {
         return $this->seat_capacity - $this->approvedBookings()->count();
     }
 
+    // ✅ Attribute-style seat availability
     public function getAvailableSeatsAttribute()
     {
-        return $this->seatsAvailable(); // Reuse method for consistency
+        return $this->seat_capacity - $this->approvedBookings()->count();
     }
 
-    public function bookedSeatNumbers()
-    {
-        return $this->approvedBookings()
-            ->pluck('seat_number')
-            ->toArray();
-    }
+    // ✅ Get array of booked seat numbers
+   // App\Models\Trip.php
+public function bookedSeatNumbers()
+{
+    return $this->bookings()
+        ->where('status', 'approved')
+        ->pluck('seat_number')
+        ->toArray();
+}
 
-    // Query Scope
+
+    // ✅ Scope for today’s trips only
     public function scopeTodayAvailable($query)
     {
-        $now = Carbon::now();
+        $now = \Carbon\Carbon::now();
 
         return $query->whereDate('travel_date', $now->toDateString())
-            ->whereTime('travel_time', '>=', $now->toTimeString());
+                     ->whereTime('travel_time', '>=', $now->toTimeString());
     }
 }

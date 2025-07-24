@@ -11,8 +11,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\TripController;
 
+
 // Home
 Route::get('/', fn() => view('welcome'));
+
 
 // Admin Registration/Login
 Route::middleware('guest')->group(function () {

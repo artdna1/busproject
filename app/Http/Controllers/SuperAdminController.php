@@ -2,50 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
+use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use App\Models\Trip;
+use Illuminate\Support\Facades\Auth;
 
-class SuperAdminController extends Controller
+class PayPalController extends Controller
 {
-    public function index()
+    public function checkout(Request $request, Trip $trip)
     {
-        // Get only admins with status pending
-        $pendingAdmins = User::where('role', 'admin')
-            ->where('status', 'pending')
-            ->get();
+        $request->validate([
+            'seat_number' => 'required|string',
+        ]);
 
-        return view('superadmin.dashboard', compact('pendingAdmins'));
-    }
+        $provider = new PayPalClient;
+        $provider->setApiCredentials(config('paypal'));
+        $token = $provider->getAccessToken();
+        $provider->setAccessToken($token);
 
-    public function approve($id)
-    {
-        $admin = User::findOrFail($id);
+        $response = $provider->createOrder([
+            "intent" => "CAPTURE",
+            "application_context" => [
+                "return_url" => route('paypal.success'),
+                "cancel_url" => route('paypal.cancel'),
+            ],
+            "purchase_units" => [[
+                "amount" => [
+                    "currency_code" => "PHP",
+                    "value" => number_format($trip->price, 2, '.', ''),
+                ],
+                "description" => "Bus Trip from {$trip->origin} to {$trip->destination} - Seat {$request->seat_number}",
+            ]],
+        ]);
 
-        if ($admin->role === 'admin' && $admin->status === 'pending') {
-            $admin->status = 'approved';
-            $admin->save();
-            return back()->with('success', 'Admin approved successfully.');
+        if (isset($response['id']) && $response['status'] === 'CREATED') {
+            foreach ($response['links'] as $link) {
+                if ($link['rel'] === 'approve') {
+                    // Store booking as pending with payment_method = PayPal here if you want before redirecting
+                    return redirect()->away($link['href']);
+                }
+            }
         }
 
-        return back()->with('error', 'Invalid admin or already approved.');
+        return back()->with('error', 'Unable to initiate PayPal payment.');
     }
 
-    public function decline($id)
+    // You need to create success and cancel routes and methods accordingly
+    public function success(Request $request)
     {
-        $admin = User::findOrFail($id);
-
-        if ($admin->role === 'admin' && $admin->status === 'pending') {
-            $admin->status = 'declined';
-            $admin->save();
-            return back()->with('success', 'Admin declined.');
-        }
-
-        return back()->with('error', 'Invalid admin or already declined.');
+        // Handle payment capture and booking confirmation here
+        // Example: capture payment, update booking status, show success page
     }
-    public function showTrips()
-{
-    $trips = \App\Models\Trip::orderBy('travel_date')->get();
-    return view('admin.trips', compact('trips'));
-}
 
+    public function cancel()
+    {
+        return redirect()->route('dashboard')->with('error', 'You cancelled the PayPal payment.');
+    }
 }

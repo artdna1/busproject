@@ -28,6 +28,10 @@ class Booking extends Model
 {
     return $this->belongsTo(\App\Models\User::class);
 }
+  protected $casts = [
+        'travel_date' => 'date',
+        'travel_time' => 'datetime:H:i:s',
+    ];
 
 public function trip()
 {
